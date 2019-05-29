@@ -5,17 +5,16 @@ version = "0.1"
 authors = ["Alexander Kaftan"]
 readme = "README.md"
 repository = ""
+packages = [
+    { include = "spider_domainauth" },
+]
 
 [tool.poetry.dependencies]
 python = ">=3.5"
-
-
-[tool.poetry.dev-dependencies]
 spkcspider = ">=0.8a2"
 
 
 [tool.poetry.extras]
-django = ["spkcspider>=0.7"]
 test = ["django-webtest", "spkcspider[test]>=0.8a2"]
 
 [tool.tox]

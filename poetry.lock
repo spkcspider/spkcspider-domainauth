@@ -1,5 +1,5 @@
 [[package]]
-category = "dev"
+category = "main"
 description = "Fast ASN.1 parser and serializer with definitions for private keys, public keys, certificates, CRL, OCSP, CMS, PKCS#3, PKCS#7, PKCS#8, PKCS#12, PKCS#5, X.509 and TSP"
 name = "asn1crypto"
 optional = false
@@ -7,7 +7,7 @@ python-versions = "*"
 version = "0.24.0"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "An easy safelist-based HTML-sanitizing tool."
 name = "bleach"
 optional = false
@@ -19,7 +19,7 @@ six = ">=1.9.0"
 webencodings = "*"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python package for providing Mozilla's CA Bundle."
 name = "certifi"
 optional = false
@@ -27,7 +27,7 @@ python-versions = "*"
 version = "2019.3.9"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Foreign Function Interface for Python calling C code."
 name = "cffi"
 optional = false
@@ -38,7 +38,7 @@ version = "1.12.3"
 pycparser = "*"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Universal encoding detector for Python 2 and 3"
 name = "chardet"
 optional = false
@@ -46,7 +46,7 @@ python-versions = "*"
 version = "3.0.4"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "cryptography is a package which provides cryptographic recipes and primitives to Python developers."
 name = "cryptography"
 optional = false
@@ -59,7 +59,7 @@ cffi = ">=1.8,<1.11.3 || >1.11.3"
 six = ">=1.4.1"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "A high-level Python Web framework that encourages rapid development and clean, pragmatic design."
 name = "django"
 optional = false
@@ -71,7 +71,7 @@ pytz = "*"
 sqlparse = "*"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Fast ratelimit implementation with django caches"
 name = "django-fast-ratelimit"
 optional = false
@@ -82,7 +82,7 @@ version = "0.4"
 django = ">=2.0"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Django utility to retrieve the next or previous object, given a current object and a queryset."
 name = "django-next-prev"
 optional = false
@@ -93,7 +93,7 @@ version = "1.0.1"
 Django = ">=1.8"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Modified Django FileResponse that adds Content-Range headers."
 name = "django-ranged-response"
 optional = false
@@ -104,7 +104,7 @@ version = "0.2.0"
 django = "*"
 
 [[package]]
-category = "dev"
+category = "main"
 description = ""
 name = "django-simple-jsonfield"
 optional = false
@@ -115,7 +115,7 @@ version = "0.3.1"
 django = "*"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Tweak the form field rendering in templates, not in python-level form definitions."
 name = "django-widget-tweaks"
 optional = false
@@ -123,7 +123,7 @@ python-versions = "*"
 version = "1.4.3"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "HTML parser based on the WHATWG HTML specification"
 name = "html5lib"
 optional = false
@@ -135,7 +135,7 @@ six = ">=1.9"
 webencodings = "*"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Internationalized Domain Names in Applications (IDNA)"
 name = "idna"
 optional = false
@@ -143,7 +143,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "2.8"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "An ISO 8601 date/time/duration parser and formatter"
 name = "isodate"
 optional = false
@@ -154,7 +154,7 @@ version = "0.6.0"
 six = "*"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "An Dict like LRU container."
 name = "lru-dict"
 optional = false
@@ -162,7 +162,7 @@ python-versions = "*"
 version = "1.1.6"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "C parser in Python"
 name = "pycparser"
 optional = false
@@ -170,7 +170,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "2.19"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python parsing module"
 name = "pyparsing"
 optional = false
@@ -178,7 +178,7 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 version = "2.4.0"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "World timezone definitions, modern and historical"
 name = "pytz"
 optional = false
@@ -186,7 +186,7 @@ python-versions = "*"
 version = "2019.1"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "RDFLib is a Python library for working with RDF, a simple yet powerful language for representing information."
 name = "rdflib"
 optional = false
@@ -198,7 +198,7 @@ isodate = "*"
 pyparsing = "*"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python HTTP for Humans."
 name = "requests"
 optional = false
@@ -212,7 +212,7 @@ idna = ">=2.5,<2.9"
 urllib3 = ">=1.21.1,<1.25.0 || >1.25.0,<1.25.1 || >1.25.1,<1.26"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python 2 and 3 compatibility utilities"
 name = "six"
 optional = false
@@ -220,7 +220,7 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*"
 version = "1.12.0"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "A secure, decentral platform for maintaining your online identity"
 name = "spkcspider"
 optional = false
@@ -243,7 +243,7 @@ rdflib = "*"
 requests = "*"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Non-validating SQL parser"
 name = "sqlparse"
 optional = false
@@ -251,7 +251,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "0.3.0"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 name = "urllib3"
 optional = false
@@ -259,7 +259,7 @@ python-versions = "*"
 version = "1.22"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Character encoding aliases for legacy web content"
 name = "webencodings"
 optional = false
@@ -267,11 +267,10 @@ python-versions = "*"
 version = "0.5.1"
 
 [extras]
-django = []
 test = []
 
 [metadata]
-content-hash = "66a89a9b260a1d7dce3ba0c25cc07a9b892c74cc04a48784aa9cec91ce7edf0b"
+content-hash = "33b88f1b2e6e30536db583a53f7f824cb074c287c023f2b7fd8f2e6f120711b5"
 python-versions = ">=3.5"
 
 [metadata.hashes]
