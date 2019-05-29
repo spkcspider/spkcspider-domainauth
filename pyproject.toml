@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "spkcspider-messaging"
-description = "Safe online messaging"
-version = "0.1a"
+name = "spkcspider-domainauth"
+description = "Helper for spkcspiders domain authentication"
+version = "0.1"
 authors = ["Alexander Kaftan"]
 readme = "README.md"
 repository = ""

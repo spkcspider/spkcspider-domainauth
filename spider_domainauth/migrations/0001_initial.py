@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(editable=False, primary_key=True, serialize=False)),
                 ('token', models.CharField(blank=True, max_length=126, null=True, unique=True)),
                 ('created', models.DateTimeField(auto_now_add=True)),
-                ('assignedcontent', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='reversetokens', to='spider_base.AssignedContent')),
+                ('assignedcontent', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='spider_base.AssignedContent')),
             ],
         ),
     ]

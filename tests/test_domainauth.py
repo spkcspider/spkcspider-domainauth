@@ -37,13 +37,20 @@ class TokenTest(TransactionWebTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(home.contents.count(), 1)
         content = home.contents.first()
-        ntoken = "abcdefg"
-        e = ReverseToken.create(assignedcontent=content)
+        secret = "abcdefg"
+        e = ReverseToken.objects.create(assignedcontent=content)
         url = reverse("spider_domainauth:db-domainauth")
         self.app.post(
             url, {
-                "payload": e.token, "token": ntoken
+                "payload": e.token, "token": secret
             }
         )
         e.refresh_from_db()
-        self.assertEqual(e.secret, ntoken)
+        self.assertEqual(e.secret, secret)
+        e2 = ReverseToken.objects.create(
+            assignedcontent=content, secret=secret
+        )
+        self.assertEqual(e2.secret, secret)
+        secret = "abcdefgsdkldsklsdklsd"
+        e2.secret = secret
+        self.assertEqual(e2.secret, secret)
