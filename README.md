@@ -5,7 +5,7 @@ Helper for db based domain auth
 # Installation
 
 ~~~~ sh
-pip install spider-domainauth
+pip install spkcspider-domainauth
 ~~~~
 
 settings:
