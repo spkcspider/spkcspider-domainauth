@@ -11,11 +11,12 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.5"
-spkcspider = ">=0.8a2"
+django = ">=2.0"
 
 
 [tool.poetry.extras]
-test = ["django-webtest", "spkcspider[test]>=0.8a2"]
+spkcspider = ["spkcspider>=0.8a2"]
+test = ["pytest-django", "django-webtest"]
 
 [tool.tox]
 legacy_tox_ini = """
@@ -25,16 +26,16 @@ skipsdist=true
 envlist = py{35,36,37}-django{22,master}
 
 [testenv]
-commands = python -Wd ./manage.py test tests
+commands = pytest tests
 
 
 setenv =
     PYTHONDONTWRITEBYTECODE=1
 
 deps =
+  pytest-django
   spkcspider[test]
   django-webtest
-  WSGIProxy2
   django22: Django>=2.2a1,<=2.2.99
   djangomaster: https://github.com/django/django/archive/master.zip
 

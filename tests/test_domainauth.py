@@ -1,14 +1,27 @@
 
+import pytest
+
+from django.conf import settings
 from django_webtest import TransactionWebTest
 from django.urls import reverse
 
-from spkcspider.apps.spider_accounts.models import SpiderUser
-from spider_domainauth.models import ReverseToken
-from spkcspider.apps.spider.signals import update_dynamic
+try:
+    from spkcspider.apps.spider_accounts.models import SpiderUser
+    from spkcspider.apps.spider.signals import update_dynamic
+    from spider_domainauth.models import ReverseToken
+except ImportError:
+    pass
 
 # Create your tests here.
 
 
+@pytest.mark.skipif(
+    (
+        "spkcspider.apps.spider" not in settings.INSTALLED_APPS and
+        "spkcspider.apps.spider.apps.SpiderBaseConfig" not in settings.INSTALLED_APPS  # noqa: E501
+    ),
+    reason="requires spkcspider"
+)
 class TokenTest(TransactionWebTest):
     fixtures = ['test_default.json']
 
