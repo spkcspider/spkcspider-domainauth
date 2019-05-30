@@ -23,12 +23,10 @@ class ReverseTokenManager(models.Manager):
 
 
 class BaseReverseToken(models.Model):
-    id = models.BigAutoField(primary_key=True, editable=False)
     token = models.CharField(
         max_length=MAX_TOKEN_B64_SIZE+hex_size_of_bigid*2+4, null=True,
         blank=True, unique=True
     )
-    created = models.DateTimeField(auto_now_add=True, editable=False)
 
     objects = ReverseTokenManager()
 
