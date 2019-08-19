@@ -16,7 +16,7 @@ django = ">=2.0"
 
 [tool.poetry.extras]
 spkcspider = ["spkcspider>=0.8a2"]
-test = ["spkcspider>=0.8a2", "pytest-django", "django-webtest"]
+test = ["spkcspider[test]", "pytest-django", "django-webtest"]
 
 [tool.tox]
 legacy_tox_ini = """
