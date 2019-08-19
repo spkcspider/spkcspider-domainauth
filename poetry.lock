@@ -31,7 +31,7 @@ spkcspider = []
 test = []
 
 [metadata]
-content-hash = "aec6b164314a8c704cc99600a3a1562924a8a8e56bd60156f19b9513a8eba019"
+content-hash = "f00b967ff0d5a5d00de27c282192cc17a1ee4ad7ae0311139ca71abe6a0ed29a"
 python-versions = ">=3.5"
 
 [metadata.hashes]
