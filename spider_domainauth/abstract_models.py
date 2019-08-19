@@ -5,14 +5,13 @@ from django.conf import settings
 from django.urls import reverse
 
 try:
-    from spkcspider.constants import (
-        hex_size_of_bigid
-    )
+    from spkcspider.constants import hex_size_of_bigid
 except ImportError:
-    from spkcspider.apps.spider.constants import (
-        hex_size_of_bigid
-    )
-from spkcspider.apps.spider.helpers import create_b64_id_token
+    from spkcspider.apps.spider.constants import hex_size_of_bigid
+try:
+    from spkcspider.utils.security import create_b64_id_token
+except ImportError:
+    from spkcspider.apps.spider.helpers import create_b64_id_token
 
 MAX_TOKEN_B64_SIZE = 90
 _striptoken = getattr(settings, "TOKEN_SIZE", 30)*4//3
