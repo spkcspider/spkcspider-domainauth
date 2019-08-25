@@ -1,16 +1,19 @@
 __all__ = ("ReverseTokenView", )
 
+import os
+import time
 import logging
 import datetime
 from urllib.parse import parse_qs, urlencode
 from importlib import import_module
+import random
 
 import requests
 
 from django.conf import settings
 from django.apps import apps
 from django.shortcuts import get_object_or_404
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.utils import timezone
@@ -19,18 +22,24 @@ from django.views import View
 
 logger = logging.getLogger(__name__)
 
+# seed with real random
+_nonexhaustRandom = random.Random(os.urandom(30))
 
-def stubhttp404_handler(*args, **kwargs):
-    pass
+
+def default_ratelimit_handler(view, request):
+    # can raise 404 for stopping processing
+    # with 0.4% chance reseed
+    if _nonexhaustRandom.randint(0, 249) == 0:
+        _nonexhaustRandom.seed(os.urandom(10))
+    time.sleep(_nonexhaustRandom.random()/8)
 
 
-_http404_handler = stubhttp404_handler
+_request_ratelimit_handler = default_ratelimit_handler
 
 if (
     "spkcspider.apps.spider" in settings.INSTALLED_APPS or
     "spkcspider.apps.spider.apps.SpiderBaseConfig"
 ):
-    _http404_handler = "spkcspider.apps.spider.functions.rate_limit_default"
     from spkcspider.apps.spider.models import (
         AssignedContent, UserComponent, AuthToken, ReferrerObject
     )
@@ -44,6 +53,7 @@ if (
         from spkcspider.apps.spider.helpers import get_requests_params
 else:
     AssignedContent = None
+
     def get_requests_params(url):
         return (
             {
@@ -53,12 +63,13 @@ else:
             False
         )
 
-if getattr(settings, "SPIDER_RATELIMIT_FUNC", None):
-    _http404_handler = settings.SPIDER_RATELIMIT_FUNC
 
-if isinstance(_http404_handler, str):
-    module, name = _http404_handler.rsplit(".", 1)
-    _http404_handler = getattr(import_module(module), name)
+if getattr(settings, "DOMAINAUTH_RATELIMIT_FUNC", None):
+    _request_ratelimit_handler = settings.DOMAINAUTH_RATELIMIT_FUNC
+
+if isinstance(_request_ratelimit_handler, str):
+    module, name = _request_ratelimit_handler.rsplit(".", 1)
+    _request_ratelimit_handler = getattr(import_module(module), name)
 
 
 class ReverseTokenView(View):
@@ -74,18 +85,18 @@ class ReverseTokenView(View):
         "DOMAINAUTH_LIFETIME",
         datetime.timedelta(hours=1)
     )
+    assert isinstance(lifetime, datetime.timedelta), "not a timedelta"
+
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-        try:
-            return super().dispatch(request, *args, **kwargs)
-        except Http404:
-            return _http404_handler(self, request)
+        _request_ratelimit_handler(self, self.request)
+        return super().dispatch(request, *args, **kwargs)
 
     def _clean_old(self, lifetime):
         expired = timezone.now() - lifetime
-        self.model.filter(created__lte=expired)
+        self.model.objects.filter(created__lte=expired)
 
-    def request_urls(self, urls):
+    def request_urls(self, contenttoken, urls):
         if not self.request.user.is_authenticated:
             return HttpResponse(status=401)
         if self.lifetime:
@@ -97,9 +108,9 @@ class ReverseTokenView(View):
             )
 
         tokens = {}
-        selfurl = request.get_full_path().split("?", 1)[0]
+        selfurl = self.request.get_full_path().split("?", 1)[0]
         with requests.Session() as session:
-            rtoken = ReverseToken.objects.create(
+            rtoken = self.model.objects.create(
                 assignedcontent=content
             )
             for url in urls:
@@ -123,7 +134,7 @@ class ReverseTokenView(View):
                         usercomponent=uc,
                         referrer=ReferrerObject.objects.get_or_create(
                             url=selfurl
-                        )
+                        )[0]
                     )
                     t.save()
                     tokens[url] = t.token
@@ -147,36 +158,36 @@ class ReverseTokenView(View):
                         ) as resp:
                             resp.raise_for_status()
                             rtoken.refresh_from_db()
-                            tokens[url] = rtoken.token
+                            tokens[url] = rtoken.secret
                     except Exception:
                         if settings.DEBUG:
                             logging.exception(
                                 "domain_auth failed for %s", newurl
                             )
-                        ret = False
                 rtoken.delete()
             return JsonResponse({
                 "tokens": tokens
             })
 
-    def answer_requests(self, oldtoken, newtoken):
+    def answer_domainauth(self, oldtoken, newtoken):
         if self.lifetime:
             self._clean_old(self.lifetime)
         self.object = get_object_or_404(
             self.model, token=oldtoken
         )
-        self.object.token = "{}_{}".format(self.object.id, newtoken)
+        # use wrapper
+        self.object.secret = newtoken
         self.object.save(update_fields=["token"])
         return HttpResponse(status=200)
 
     def post(self, request, *args, **kwargs):
         oldtoken = request.POST.get("payload")
-        newtoken = request.POST.get("token")
+        token = request.POST.get("token")
         urls = request.POST.getlist("urls")
         if urls:
-            return self.request_urls(urls)
-        elif oldtoken and newtoken:
-            return self.answer_requests(oldtoken, newtoken)
+            return self.request_urls(token, urls)
+        elif oldtoken and token:
+            return self.answer_domainauth(oldtoken, token)
         else:
             raise Http404()
 

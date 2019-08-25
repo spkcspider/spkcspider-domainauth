@@ -4,16 +4,9 @@ from django.db import models
 from django.conf import settings
 from django.urls import reverse
 
-try:
-    from spkcspider.constants import hex_size_of_bigid
-except ImportError:
-    from spkcspider.apps.spider.constants import hex_size_of_bigid
-try:
-    from spkcspider.utils.security import create_b64_id_token
-except ImportError:
-    from spkcspider.apps.spider.helpers import create_b64_id_token
+from .utils import create_domainauth_token
 
-MAX_TOKEN_B64_SIZE = 90
+hex_size_of_bigid = 16
 _striptoken = getattr(settings, "TOKEN_SIZE", 30)*4//3
 
 
@@ -28,7 +21,7 @@ class ReverseTokenManager(models.Manager):
 
 class BaseReverseToken(models.Model):
     token = models.CharField(
-        max_length=MAX_TOKEN_B64_SIZE+hex_size_of_bigid*2+4, null=True,
+        max_length=255, null=True,
         blank=True, unique=True
     )
 
@@ -48,10 +41,11 @@ class BaseReverseToken(models.Model):
 
     def initialize_token(self, secret=None):
         if secret:
+            assert len(secret) <= 239, "Secret too big"
             self.token = "{}_{}".format(self.id, secret)
         else:
-            self.token = create_b64_id_token(
-                self.id, "_", getattr(settings, "TOKEN_SIZE", 30)
+            self.token = create_domainauth_token(
+                self.id, "_"
             )
 
     def _get_secret(self):

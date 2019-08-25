@@ -9,6 +9,6 @@ urlpatterns = [
     path(
         'db/',
         ReverseTokenView.as_view(),
-        name='db-domainauth'
+        name='domainauth-db'
     )
 ]

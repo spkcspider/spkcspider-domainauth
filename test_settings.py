@@ -4,6 +4,7 @@ from spkcspider.settings import *  # noqa: F403, F401
 
 INSTALLED_APPS += [
     'spkcspider.apps.spider_keys',
+    'spkcspider.apps.spider_tags',
     'spider_domainauth'
 
 ]
@@ -26,3 +27,4 @@ DATABASES = {
 FIXTURE_DIRS = [
      "tests/fixtures/"
 ]
+DOMAINAUTH_URL = 'spider_domainauth:domainauth-db'
