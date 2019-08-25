@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "spkcspider-domainauth"
 description = "Helper for spkcspiders domain authentication"
-version = "0.4"
+version = "0.5"
 authors = ["Alexander Kaftan"]
 readme = "README.md"
 repository = "https://github.com/spkcspider/spkcspider-domainauth"
