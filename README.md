@@ -42,6 +42,7 @@ token = response.json["tokens"]["foo"]
 Module based:
 ~~~~ python
 from spider_domainauth.models import ReverseToken
+from django.shortcuts import resolve_url
 
 # overloaded create method
 rtoken = ReverseToken.objects.create()
@@ -56,11 +57,11 @@ e.secret
 ~~~~
 
 
-## Other settings:
+## Settings:
 
-* DOMAINAUTH_RATELIMIT_FUNC: ratelimit access tries
+* DOMAINAUTH_RATELIMIT_FUNC: ratelimit access tries, can be also used to limit number of tokens
 * DOMAINAUTH_LIFETIME: token lifetime (default 1 hour) (Note: if "url based"-method is used, the token is automatically deleted afterwards)
-*
+* DOMAINAUTH_URL: url to domain auth view (required for external users)
 
 # TODO:
 * overload other manager methods

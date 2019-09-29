@@ -26,13 +26,28 @@ logger = logging.getLogger(__name__)
 _nonexhaustRandom = random.Random(os.urandom(30))
 
 
-def default_ratelimit_handler(view, request):
+def default_ratelimit_handler(request, view):
     # can raise 404 for stopping processing
     # with 0.4% chance reseed
     if _nonexhaustRandom.randint(0, 249) == 0:
         _nonexhaustRandom.seed(os.urandom(10))
     time.sleep(_nonexhaustRandom.random()/8)
 
+
+try:
+    from ratelimit import decorate, get_ratelimit
+    # trigger TypeError if django-fast-ratelimit to old
+    get_ratelimit(key=False, group="abc", rate=(1, 1), empty_to=1)
+    default_ratelimit_handler = decorate(
+        func=default_ratelimit_handler,
+        key="user",
+        rate="1/10s",
+        block=True,
+        methods=("POST",),
+        empty_to=0
+    )
+except (ImportError, TypeError):
+    pass
 
 _request_ratelimit_handler = default_ratelimit_handler
 
@@ -89,7 +104,7 @@ class ReverseTokenView(View):
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-        _request_ratelimit_handler(self, self.request)
+        _request_ratelimit_handler(self.request, self)
         return super().dispatch(request, *args, **kwargs)
 
     def _clean_old(self, lifetime):

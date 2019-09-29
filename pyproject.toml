@@ -16,6 +16,7 @@ django = ">=2.0"
 
 [tool.poetry.extras]
 spkcspider = ["spkcspider>=0.8a2"]
+ratelimit = ["django-fast-ratelimit>=0.5"]
 test = ["spkcspider[test]", "pytest-django", "django-webtest"]
 
 [tool.tox]
