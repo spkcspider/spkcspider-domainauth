@@ -135,7 +135,8 @@ class ReverseTokenView(View):
                     # ignore invalid requests
                     if not match:
                         continue
-                    if match.groupdict()["access"] == "list":
+                    match = match.groupdict()
+                    if match["access"] == "list":
                         uc = UserComponent.objects.filter(
                             token=match["static_token"]
                         ).first()
