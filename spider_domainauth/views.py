@@ -4,7 +4,7 @@ import os
 import time
 import logging
 import datetime
-from urllib.parse import parse_qs, urlencode
+from urllib.parse import parse_qs, urlencode, urlsplit
 from importlib import import_module
 import random
 
@@ -18,6 +18,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.utils import timezone
 from django.views import View
+from django.test import Client
+from django.http.request import validate_host
 
 
 logger = logging.getLogger(__name__)
@@ -55,13 +57,7 @@ if (
     "spkcspider.apps.spider" in settings.INSTALLED_APPS or
     "spkcspider.apps.spider.apps.SpiderBaseConfig"
 ):
-    from spkcspider.apps.spider.models import (
-        AssignedContent, UserComponent, AuthToken, ReferrerObject
-    )
-    try:
-        from spkcspider.constants import static_token_matcher
-    except ImportError:
-        from spkcspider.apps.spider.constants import static_token_matcher
+    from spkcspider.apps.spider.models import AssignedContent
     try:
         from spkcspider.apps.spider.conf import get_requests_params
     except ImportError:
@@ -69,13 +65,26 @@ if (
 else:
     AssignedContent = None
 
+    _default_allowed_hosts = ['localhost', '127.0.0.1', '[::1]']
+
     def get_requests_params(url):
+
+        allowed_hosts = settings.ALLOWED_HOSTS
+        if settings.DEBUG and not allowed_hosts:
+            allowed_hosts = _default_allowed_hosts
+
+        if validate_host(url, allowed_hosts):
+            inline_domain = urlsplit(url)
+            inline_domain = \
+                inline_domain.netloc or inline_domain.path.split("/", 1)[0]
+        else:
+            inline_domain = None
         return (
             {
                 "timeout": 3,
                 "proxies": {}
             },
-            None
+            inline_domain
         )
 
 
@@ -123,50 +132,41 @@ class ReverseTokenView(View):
             )
 
         tokens = {}
-        selfurl = self.request.get_full_path().split("?", 1)[0]
+        selfurl = self.request.build_absolute_uri().split("?", 1)[0]
         with requests.Session() as session:
             rtoken = self.model.objects.create(
                 assignedcontent=content
             )
             for url in urls:
-                params, inline_domain = get_requests_params(url)
-                if inline_domain:
-                    match = static_token_matcher.match(url)
-                    # ignore invalid requests
-                    if not match:
-                        continue
-                    match = match.groupdict()
-                    if match["access"] == "list":
-                        uc = UserComponent.objects.filter(
-                            token=match["static_token"]
-                        ).first()
-                    else:
-                        uc = UserComponent.objects.filter(
-                            contents__token=match["static_token"]
-                        ).first()
-                    if not uc:
-                        continue
-                    t = AuthToken(
-                        usercomponent=uc,
-                        referrer=ReferrerObject.objects.get_or_create(
-                            url=selfurl
-                        )[0]
-                    )
-                    t.save()
-                    tokens[url] = t.token
+                splitted = url.split("?", 1)
+                if len(splitted) == 2:
+                    getparams = parse_qs(splitted[1])
                 else:
-                    splitted = url.split("?", 1)
-                    if len(splitted) == 2:
-                        getparams = parse_qs(splitted[1])
-                    else:
-                        getparams = {}
-                    rtoken.initialize_token()
-                    rtoken.save(update_fields=["token"])
-                    getparams["referrer"] = selfurl
-                    getparams["payload"] = rtoken.token
-                    newurl = "{}?{}".format(
-                        splitted[0], urlencode(getparams, doseq=True)
+                    getparams = {}
+                rtoken.initialize_token()
+                rtoken.save(update_fields=["token"])
+                # can only handle domain auth
+                getparams["intention"] = "domain"
+                getparams["referrer"] = selfurl
+                getparams["payload"] = rtoken.token
+                newurl = "{}?{}".format(
+                    splitted[0], urlencode(getparams, doseq=True)
+                )
+                params, inline_domain = get_requests_params(newurl)
+                if inline_domain:
+                    response = Client().get(
+                        newurl, secure=True, follow=True, Connection="close",
+                        SERVER_NAME=inline_domain
                     )
+                    if response.status_code >= 400:
+                        if settings.DEBUG:
+                            logging.exception(
+                                "domain_auth failed for %s", newurl
+                            )
+                    else:
+                        rtoken.refresh_from_db()
+                        tokens[url] = rtoken.secret
+                else:
                     try:
                         with session.get(
                             newurl,
@@ -196,6 +196,10 @@ class ReverseTokenView(View):
         self.object.save(update_fields=["token"])
         return HttpResponse(status=200)
 
+    def get(self, request, *args, **kwargs):
+        # domainauth redirects clients here, so add stub
+        return HttpResponse(status=200)
+
     def post(self, request, *args, **kwargs):
         oldtoken = request.POST.get("payload")
         token = request.POST.get("token")
@@ -210,5 +214,5 @@ class ReverseTokenView(View):
     def options(self, request, *args, **kwargs):
         ret = super().options()
         ret["Access-Control-Allow-Origin"] = "*"
-        ret["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+        ret["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
         return ret

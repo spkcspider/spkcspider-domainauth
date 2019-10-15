@@ -100,7 +100,7 @@ class TokenTest(TransactionWebTest):
         self.assertEqual(home.contents.count(), 1)
         content = home.contents.first()
         dauthurl = resolve_url(settings.DOMAINAUTH_URL)
-        contenturl = "http://testserver{}".format(
+        contenturl = "http://testserver{}".format(  # ?intention=domain
             content.get_absolute_url()
         )
         body = {
