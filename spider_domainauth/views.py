@@ -36,7 +36,7 @@ def default_ratelimit_handler(request, view):
 
 try:
     from ratelimit import decorate, get_ratelimit
-    # trigger TypeError if django-fast-ratelimit to old
+    # trigger TypeError if django-fast-ratelimit is too old
     get_ratelimit(key=False, group="abc", rate=(1, 1), empty_to=1)
     default_ratelimit_handler = decorate(
         func=default_ratelimit_handler,
@@ -75,7 +75,7 @@ else:
                 "timeout": 3,
                 "proxies": {}
             },
-            False
+            None
         )
 
 
@@ -129,8 +129,8 @@ class ReverseTokenView(View):
                 assignedcontent=content
             )
             for url in urls:
-                params, can_inline = get_requests_params(url)
-                if can_inline:
+                params, inline_domain = get_requests_params(url)
+                if inline_domain:
                     match = static_token_matcher.match(url)
                     # ignore invalid requests
                     if not match:
