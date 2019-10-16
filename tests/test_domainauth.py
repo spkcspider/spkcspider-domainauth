@@ -4,6 +4,7 @@ import pytest
 from django.conf import settings
 from django_webtest import TransactionWebTest
 from django.shortcuts import resolve_url
+from django.test import override_settings
 
 try:
     from spkcspider.apps.spider_accounts.models import SpiderUser
@@ -106,9 +107,10 @@ class TokenTest(TransactionWebTest):
         body = {
             "urls": [contenturl]
         }
-        response = self.app.post(
-            dauthurl, body
-        )
+        with override_settings(DEBUG=True):
+            response = self.app.post(
+                dauthurl, body
+            )
         self.assertIn(contenturl, response.json["tokens"])
         self.assertTrue(
             AuthToken.objects.filter(
